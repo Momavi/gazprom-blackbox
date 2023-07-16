@@ -16,14 +16,16 @@
               </h3>
               <div class="mt-2">
                 <form @submit.prevent="submitForm">
-                  <input type="text" v-model="username" placeholder="Почта"
+                  <input type="text" v-model="username" id="email" name="email" placeholder="Почта" autocomplete="email"
                          class="w-full px-3 py-2 placeholder-gray-400 text-gray-100 rounded-lg focus:outline-none"/>
-                  <input type="password" v-model="password" autocomplete="current-password" placeholder="Пароль"
+                  <input type="password" v-model="password" id="password" name="password"
+                         autocomplete="current-password" placeholder="Пароль"
                          class="w-full mt-2 px-3 py-2 placeholder-gray-400 text-gray-100 rounded-lg focus:outline-none"/>
                   <button type="submit" class="w-full py-2 mt-2 rounded-lg bg-blue-500 text-white">Войти</button>
                 </form>
                 <div v-if="usernameError" class="text-red-500">{{ usernameError }}</div>
                 <div v-if="passwordError" class="text-red-500">{{ passwordError }}</div>
+                <p class="text-red-500">{{ error }}</p>
               </div>
             </div>
           </div>
@@ -40,18 +42,25 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { ref } from 'vue';
 import { useModalStore } from '@stores/modal-reducer';
+import { useUserStore } from '@stores/user-reducer.js';
+import { useNotificationStore } from '@stores/notification.js';
 
 export default {
   setup() {
     const modalStore = useModalStore();
+    const userStore = useUserStore();
+    const notificationStore = useNotificationStore();
+
     const username = ref('');
     const password = ref('');
     const usernameError = ref('');
     const passwordError = ref('');
+    const error = ref('');
 
-    function submitForm() {
+    async function submitForm() {
       usernameError.value = '';
       passwordError.value = '';
 
@@ -66,18 +75,31 @@ export default {
       if ( usernameError.value || passwordError.value ) {
         return;
       }
-
-      console.log('Form submitted:', { username: username.value, password: password.value });
+      await axios.post('/api/users/login',
+          {
+            email: username.value,
+            password: password.value,
+          },
+      ).then(resp => {
+        userStore.setUser(resp.data)
+        notificationStore.setData(200, resp.data.message);
+        localStorage.setItem('token', resp.data.token);
+        modalStore.closeLogin();
+      }).catch((error) => {
+        console.log(error);
+        this.error = error.response.data.message;
+      });
     }
 
     return {
       username,
       password,
+      error,
       modalStore,
       usernameError,
       passwordError,
-      submitForm
-    }
+      submitForm,
+    };
   },
 };
 </script>

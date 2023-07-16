@@ -1,17 +1,25 @@
 <template>
   <div class="mt-24">
-    <button class="mr-24 bg-stone-700" @click="modalStore.openLogin()">
+    <button v-if="userStore.access !== ''" class="mr-24 bg-red-700" @click="userStore.resetUser()">
       <span class="flex">
-        <span class="mr-2">Авторизация</span>
+        <span class="mr-2 select-none">Разлогиниться</span>
+        <KeyIcon class="h-6 w-6"/>
+      </span>
+    </button>
+    <span v-else>
+          <button class="mr-24 bg-stone-700" @click="modalStore.openLogin()">
+      <span class="flex">
+        <span class="mr-2 select-none">Авторизация</span>
         <KeyIcon class="h-6 w-6"/>
       </span>
     </button>
     <button class="bg-stone-700" @click="modalStore.openRegister()">
       <span class="flex">
-        <span class="mr-2">Регистрация</span>
+        <span class="mr-2 select-none">Регистрация</span>
         <UserIcon class="h-6 w-6"/>
       </span>
     </button>
+    </span>
   </div>
 
   <LoginForm v-if="modalStore.isLoginOpen"/>
@@ -24,6 +32,8 @@ import { useModalStore } from '@stores/modal-reducer.js';
 
 import LoginForm from '../../components/form/LoginForm.vue';
 import RegisterForm from '../../components/form/RegisterForm.vue';
+import { useUserStore } from '@stores/user-reducer.js';
 
 const modalStore = useModalStore();
+const userStore = useUserStore();
 </script>

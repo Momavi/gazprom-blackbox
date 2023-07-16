@@ -10,23 +10,32 @@
 
 <script setup>
 import MenuItem from './MenuItem.vue';
-import { EnvelopeIcon, FolderOpenIcon, ListBulletIcon } from '@heroicons/vue/24/solid/index.js';
+import { EnvelopeIcon, FolderOpenIcon, ListBulletIcon, IdentificationIcon } from '@heroicons/vue/24/solid/index.js';
 
 const items = [
   {
     title: 'Файловое хранилище',
     icon: FolderOpenIcon,
-    access: false,
+    route: '',
+    access: 3,
   },
   {
     title: 'Почта',
     icon: EnvelopeIcon,
-    access: false,
+    route: '',
+    access: 1,
+  },
+  {
+    title: 'Система пропусков',
+    icon: IdentificationIcon,
+    route: 'Identification',
+    access: 2,
   },
   {
     title: 'Лента',
     icon: ListBulletIcon,
-    access: true,
+    route: 'Posts',
+    access: 0,
   },
 ];
 </script>

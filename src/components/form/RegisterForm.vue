@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title"
+  <div class="fixed z-99 inset-0 overflow-y-auto" aria-labelledby="modal-title"
        role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
       <div class="fixed inset-0 bg-gray-800 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
@@ -16,18 +16,19 @@
               </h3>
               <div class="mt-2">
                 <form @submit.prevent="submitForm">
-                  <input type="text" v-model="username" placeholder="Почта"
+                  <input type="text" v-model="email" placeholder="Почта"
                          class="w-full px-3 py-2 placeholder-gray-400 text-gray-100 rounded-lg focus:outline-none mb-2"/>
                   <input type="text" v-model="username" placeholder="Имя пользователя"
                          class="w-full px-3 py-2 placeholder-gray-400 text-gray-100 rounded-lg focus:outline-none"/>
                   <input type="password" v-model="password" placeholder="Пароль"
                          class="w-full mt-2 px-3 py-2 placeholder-gray-400 text-gray-100 rounded-lg focus:outline-none"/>
-                  <input type="password" v-model="password" placeholder="Повторите пароль"
+                  <input type="password" v-model="passwordAgain" placeholder="Повторите пароль"
                          class="w-full mt-2 px-3 py-2 placeholder-gray-400 text-gray-100 rounded-lg focus:outline-none"/>
                   <button type="submit" class="w-full py-2 mt-2 rounded-lg bg-blue-500 text-white">Зарегистрироваться</button>
                 </form>
                 <div v-if="usernameError" class="text-red-500">{{ usernameError }}</div>
                 <div v-if="passwordError" class="text-red-500">{{ passwordError }}</div>
+                <p class="text-red-500">{{ error }}</p>
               </div>
             </div>
           </div>
@@ -44,18 +45,24 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { ref } from 'vue';
 import { useModalStore } from '@stores/modal-reducer';
+import { useNotificationStore } from '@stores/notification.js';
 
 export default {
   setup() {
     const modalStore = useModalStore();
+    const notificationStore = useNotificationStore()
+    const email = ref('');
     const username = ref('');
     const password = ref('');
+    const passwordAgain = ref('')
     const usernameError = ref('');
     const passwordError = ref('');
+    const error = ref('')
 
-    function submitForm() {
+    async function submitForm() {
       usernameError.value = '';
       passwordError.value = '';
 
@@ -71,15 +78,30 @@ export default {
         return;
       }
 
-      console.log('Form submitted:', { username: username.value, password: password.value });
+      await axios.post('/api/users/register',
+          {
+            email: email.value,
+            name: username.value,
+            password: password.value,
+          },
+      ).then((resp) => {
+        modalStore.closeRegister()
+        notificationStore.setData(200, resp.data.message)
+      }).catch((error) => {
+        console.log(error)
+        this.error = error.response.data.message
+      });
     }
 
     return {
+      email,
       username,
       password,
+      passwordAgain,
       modalStore,
       usernameError,
       passwordError,
+      error,
       submitForm
     }
   },

@@ -1,24 +1,29 @@
 <template>
-  <div :class="itemClass">
-    <component :is="item.icon" :class="iconClass"/>
+  <div v-if="userStore.accessLevel >= item.access"
+       :class="`${baseClasses} cursor-pointer duration-300 hover:opacity-60 hover:bg-emerald-950 opacity-100`"
+       @click="goTo(item.route)">
+    <component :is="item.icon" :class="`${baseIcon} color-access`"/>
+    <h1 class="select-none">{{ item.title }}</h1>
+  </div>
+  <div v-else :class="`${baseClasses} opacity-40`">
+    <component :is="item.icon" :class="`${baseIcon} color-stone-700`"/>
     <h1 class="select-none">{{ item.title }}</h1>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { router } from '../../routes.js';
+import { useUserStore } from '@stores/user-reducer.js';
 
+const userStore = useUserStore();
 const props = defineProps({
   item: Object,
 });
 
-const itemClass = computed(() => {
-  const baseClasses = 'flex flex-col opacity-40 justify-center items-center ease-in p-4 rounded-lg';
+function goTo(route) {
+  router.push(route);
+}
 
-  return props.item.access
-      ? `${baseClasses} cursor-pointer duration-300 hover:opacity-60 hover:bg-emerald-950 opacity-100`
-      : baseClasses;
-});
-
-const iconClass = computed(() => `h-48 w-48 ${props.item.access ? 'color-access' : 'color-stone-700'}`);
+const baseClasses = 'flex flex-col justify-center items-center ease-in p-4 rounded-lg';
+const baseIcon = 'h-48 w-48'
 </script>
