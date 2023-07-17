@@ -4,6 +4,7 @@
         v-for="(item, index) in items"
         :key="index"
         :item="item"
+        :accessLevel="userStore.accessLevel"
     />
   </div>
 </template>
@@ -11,6 +12,8 @@
 <script setup>
 import MenuItem from './MenuItem.vue';
 import { EnvelopeIcon, FolderOpenIcon, ListBulletIcon, IdentificationIcon } from '@heroicons/vue/24/solid/index.js';
+import { useUserStore } from '@stores/user-reducer.js';
+const userStore = useUserStore();
 
 const items = [
   {

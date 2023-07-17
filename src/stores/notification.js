@@ -10,12 +10,12 @@ export const useNotificationStore = defineStore({
     countdownTimer: null,
   }),
   actions: {
-    setData(status, message) {
+    setData(status, message, countdown = 3) {
       clearInterval(this.countdownTimer);
       this.showNotification = true;
       this.status = status;
       this.message = message;
-      this.countdown = 5;
+      this.countdown = countdown;
       this.startTimer()
     },
     startTimer() {

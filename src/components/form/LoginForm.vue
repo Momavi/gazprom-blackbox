@@ -81,13 +81,16 @@ export default {
             password: password.value,
           },
       ).then(resp => {
-        userStore.setUser(resp.data)
+        userStore.setUser(resp.data);
         notificationStore.setData(200, resp.data.message);
         localStorage.setItem('token', resp.data.token);
         modalStore.closeLogin();
       }).catch((error) => {
         console.log(error);
-        this.error = error.response.data.message;
+        if ( error.response.status === 429 )
+          this.error = error.response.data;
+        else
+          this.error = error.response.data.message;
       });
     }
 
