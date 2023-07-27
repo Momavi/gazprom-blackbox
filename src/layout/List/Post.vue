@@ -24,14 +24,14 @@
            placeholder="Комментарий" @keydown.enter="sendAddComment(post)"/>
     <div v-if="showCommentInput">
       <div class="border-b border-gray-600 mb-2 mt-6"></div>
-      <div v-for="(comment, index) in post.comments" :key="comment.id" class="mb-4">
+      <div v-for="(comment, index) in post.comments" :key="index" class="mb-4">
         <div class="flex justify-between my-1">
           <div class="flex">
             <UserCircleIcon class="h-6 w-6 mr-2"/>
             <p class="text-left">{{ comment.user.name }}</p>
           </div>
           <button v-if="userStore.id === comment.user.id" class="bg-red-600 h-8 text-center p-1 rounded text-white select-none"
-                  @click="deleteComment(post, comment, index)"><TrashIcon class="h-6 w-6"/>
+                  @click="deleteComment(post, comment)"><TrashIcon class="h-6 w-6"/>
           </button>
         </div>
         <div>

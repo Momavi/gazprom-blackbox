@@ -49,11 +49,14 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { useModalStore } from '@stores/modal-reducer';
 import { useNotificationStore } from '@stores/notification.js';
+import { useUserStore } from '@stores/user-reducer.js';
 
 export default {
   setup() {
     const modalStore = useModalStore();
     const notificationStore = useNotificationStore()
+    const userStore = useUserStore()
+
     const email = ref('');
     const username = ref('');
     const password = ref('');
@@ -84,7 +87,24 @@ export default {
             name: username.value,
             password: password.value,
           },
-      ).then((resp) => {
+      ).then(async (resp) => {
+        await axios.post('/api/users/login',
+            {
+              email: email.value,
+              password: password.value,
+            },
+        ).then(resp => {
+          userStore.setUser(resp.data);
+          notificationStore.setData(200, resp.data.message);
+          localStorage.setItem('token', resp.data.token);
+          modalStore.closeLogin();
+        }).catch((error) => {
+          console.log(error);
+          if ( error.response.status === 429 )
+            this.error = error.response.data;
+          else
+            this.error = error.response.data.message;
+        });
         modalStore.closeRegister()
         notificationStore.setData(200, resp.data.message)
       }).catch((error) => {

@@ -19,20 +19,20 @@ const items = [
   {
     title: 'Файловое хранилище',
     icon: FolderOpenIcon,
-    route: '',
+    route: 'Files',
     access: 3,
   },
   {
     title: 'Почта',
     icon: EnvelopeIcon,
-    route: '',
-    access: 1,
+    route: 'Mail',
+    access: 2,
   },
   {
     title: 'Система пропусков',
     icon: IdentificationIcon,
     route: 'Identification',
-    access: 2,
+    access: 3,
   },
   {
     title: 'Лента',

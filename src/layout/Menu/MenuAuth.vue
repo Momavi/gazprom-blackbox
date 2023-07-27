@@ -1,8 +1,8 @@
 <template>
   <div class="mt-24">
-    <button v-if="userStore.access !== ''" class="mr-24 bg-red-700" @click="userStore.resetUser()">
+    <button v-if="userStore.access !== ''" class="bg-red-700" @click="userStore.resetUser()">
       <span class="flex">
-        <span class="mr-2 select-none">Разлогиниться</span>
+        <span class="select-none mr-2">Выйти из системы</span>
         <KeyIcon class="h-6 w-6"/>
       </span>
     </button>

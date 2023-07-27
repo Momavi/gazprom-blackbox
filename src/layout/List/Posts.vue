@@ -1,7 +1,8 @@
 <template>
   <div v-if="userStore.accessLevel >= 1">
     <div class="mb-2">
-      <input v-model="newPost" class="mb-5 px-4 py-1 rounded-xl bg-gray-600" placeholder="Что происходит?" @keydown.enter="addPost"/>
+      <input v-model="newPost" class="mb-5 px-4 py-1 rounded-xl bg-gray-600" placeholder="Что происходит?"
+             @keydown.enter="addPost"/>
     </div>
     <div>
       <button class="bg-gray-600" @click="addPost">Твитнуть</button>
@@ -67,10 +68,13 @@ async function deletePost(post) {
   });
 }
 
-async function deleteComment(post, comment, index) {
+async function deleteComment(post, comment) {
   await axios.delete(`/api/posts/${ post.id }/comments/${ comment.id }`,
   ).then(() => {
-    post.comments.pop(index);
+    let postId = posts.value.findIndex(item => item.id === post.id);
+    let indexToRemove = post.comments.findIndex(item => item.id === comment.id);
+
+    posts.value[postId].comments.splice(indexToRemove, 1);
   });
 }
 
