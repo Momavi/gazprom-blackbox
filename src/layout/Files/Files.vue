@@ -1,4 +1,5 @@
 <template>
+  <p v-if="showError" class="text-red-600">У вас нет доступа, авторизуйтесь</p>
   <div v-if="!file.length" class="flex flex-col items-center justify-center">
     <div v-if="!showHomeFolder" class="flex align-middle place-items-center">
       <div @click="homeFolder"
@@ -45,39 +46,37 @@
 import axios from 'axios';
 import { FolderIcon, DocumentIcon, ArrowLeftIcon } from '@heroicons/vue/24/solid/index.js';
 import { onMounted, ref } from 'vue';
+import { makeRequest } from '../../utility/request.js';
 
 const openFolderName = ref('');
 const folder = ref([]);
 const openFileName = ref('');
 const file = ref([]);
-let showHomeFolder = ref(true);
+let showError = ref(false);
+const showHomeFolder = ref(true);
 
 async function created() {
-  const response = await axios.get('http://localhost:9090/api/files');
-  folder.value = response.data;
+  folder.value = await makeRequest('get', '/api/files', showError);
 }
 
 async function openFolder(folderName) {
-  const response = await axios.get(`http://localhost:9090/api/files/folder/${ folderName }`);
-  folder.value = response.data;
+  folder.value = await makeRequest('get', `/api/files/folder/${folderName}`, showError);
   openFolderName.value = folderName;
   showHomeFolder.value = false;
 }
 
 async function openFile(fileName) {
   let response;
-  if ( openFolderName.value.length ) {
-    response = await axios.post(`http://localhost:9090/api/files/fileinfolder`, {
-      pathToFile: `files/${openFolderName.value}/${ fileName }`,
-    },);
+  if (openFolderName.value.length) {
+    response = await makeRequest('post', `/api/files/fileinfolder`, showError, { pathToFile: `files/${openFolderName.value}/${fileName}` });
   } else {
-    response = await axios.get(`http://localhost:9090/api/files/file/${ fileName }`);
+    response = await makeRequest('get', `/api/files/file/${fileName}`, showError);
   }
   openFileName.value = fileName;
-  if ( response.data.length ) {
-    file.value = response.data;
+  if (response.length) {
+    file.value = response;
   } else {
-    file.value = [ '' ];
+    file.value = [''];
   }
   showHomeFolder.value = false;
 }

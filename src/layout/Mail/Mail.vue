@@ -100,17 +100,15 @@ export default {
               address: filterAddress.value,
             },
           });
-          showError.value = response.status === 401;
           emails.value = response.data;
         } else {
           const response = await axios.get('/api/email/', {
             headers: { 'Authorization': `Bearer ${ localStorage.getItem('token') }` },
           });
-          showError.value = response.status === 401;
           emails.value = response.data;
         }
       } catch ( error ) {
-        showError.value = error.response.status === 401;
+        showError.value = error.response.status === 403 || 401;
         console.error('Error fetching emails:', error);
       }
     };

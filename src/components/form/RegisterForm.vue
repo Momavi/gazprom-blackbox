@@ -24,10 +24,9 @@
                          class="w-full mt-2 px-3 py-2 placeholder-gray-400 text-gray-100 rounded-lg focus:outline-none"/>
                   <input type="password" v-model="passwordAgain" placeholder="Повторите пароль"
                          class="w-full mt-2 px-3 py-2 placeholder-gray-400 text-gray-100 rounded-lg focus:outline-none"/>
-                  <button type="submit" class="w-full py-2 mt-2 rounded-lg bg-blue-500 text-white">Зарегистрироваться</button>
+                  <button type="submit" class="w-full py-2 mt-2 rounded-lg bg-blue-500 text-white">Зарегистрироваться
+                  </button>
                 </form>
-                <div v-if="usernameError" class="text-red-500">{{ usernameError }}</div>
-                <div v-if="passwordError" class="text-red-500">{{ passwordError }}</div>
                 <p class="text-red-500">{{ error }}</p>
               </div>
             </div>
@@ -35,7 +34,7 @@
         </div>
         <div class="bg-stone-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button type="button" @click="modalStore.closeRegister()"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium text-gray-100 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium text-gray-100 hover:opacity-70 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
             Закрыть
           </button>
         </div>
@@ -44,86 +43,76 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import axios from 'axios';
 import { ref } from 'vue';
 import { useModalStore } from '@stores/modal-reducer';
 import { useNotificationStore } from '@stores/notification.js';
 import { useUserStore } from '@stores/user-reducer.js';
+import { validateEmail } from '../../utility/validateEmail.js';
 
-export default {
-  setup() {
-    const modalStore = useModalStore();
-    const notificationStore = useNotificationStore()
-    const userStore = useUserStore()
+const modalStore = useModalStore();
+const notificationStore = useNotificationStore();
+const userStore = useUserStore();
 
-    const email = ref('');
-    const username = ref('');
-    const password = ref('');
-    const passwordAgain = ref('')
-    const usernameError = ref('');
-    const passwordError = ref('');
-    const error = ref('')
+const email = ref('');
+const username = ref('');
+const password = ref('');
+const passwordAgain = ref('');
+const error = ref('');
 
-    async function submitForm() {
-      usernameError.value = '';
-      passwordError.value = '';
+async function submitForm() {
+  error.value = '';
 
-      if ( !username.value.trim() ) {
-        usernameError.value = 'Введите почту.';
-      }
+  if ( !validateEmail(email.value) ) {
+    error.value = 'Введите почту.';
+    return
+  }
 
-      if ( !password.value.trim() ) {
-        passwordError.value = 'Введите пароль.';
-      }
+  if ( !username.value.trim() ) {
+    error.value = 'Введите имя пользователя.';
+    return
+  }
 
-      if ( usernameError.value || passwordError.value ) {
-        return;
-      }
+  if ( !password.value.trim() ) {
+    error.value = 'Введите пароль.';
+    return
+  }
 
-      await axios.post('/api/users/register',
-          {
-            email: email.value,
-            name: username.value,
-            password: password.value,
-          },
-      ).then(async (resp) => {
-        await axios.post('/api/users/login',
-            {
-              email: email.value,
-              password: password.value,
-            },
-        ).then(resp => {
-          userStore.setUser(resp.data);
-          notificationStore.setData(200, resp.data.message);
-          localStorage.setItem('token', resp.data.token);
-          modalStore.closeLogin();
-        }).catch((error) => {
-          console.log(error);
-          if ( error.response.status === 429 )
-            this.error = error.response.data;
-          else
-            this.error = error.response.data.message;
-        });
-        modalStore.closeRegister()
-        notificationStore.setData(200, resp.data.message)
-      }).catch((error) => {
-        console.log(error)
-        this.error = error.response.data.message
-      });
-    }
+  if ( !passwordAgain.value.trim() ) {
+    error.value = 'Введите пароль еще раз.';
+    return
+  }
 
-    return {
-      email,
-      username,
-      password,
-      passwordAgain,
-      modalStore,
-      usernameError,
-      passwordError,
-      error,
-      submitForm
-    }
-  },
-};
+  await axios.post('/api/users/register',
+      {
+        email: email.value,
+        name: username.value,
+        password: password.value,
+      },
+  ).then(async (resp) => {
+    await axios.post('/api/users/login',
+        {
+          email: email.value,
+          password: password.value,
+        },
+    ).then(resp => {
+      userStore.setUser(resp.data);
+      notificationStore.setData(200, resp.data.message);
+      localStorage.setItem('token', resp.data.token);
+      modalStore.closeLogin();
+    }).catch((error) => {
+      console.log(error);
+      if ( error.response.status === 429 )
+        this.error = error.response.data;
+      else
+        this.error = error.response.data.message;
+    });
+    modalStore.closeRegister();
+    notificationStore.setData(200, resp.data.message);
+  }).catch((error) => {
+    console.log(error);
+    this.error = error.response.data.message;
+  });
+}
 </script>

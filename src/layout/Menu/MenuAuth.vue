@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-24">
+  <div class="md:mt-24 sm:mt-12">
     <button v-if="userStore.access !== ''" class="bg-red-700" @click="userStore.resetUser()">
       <span class="flex">
         <span class="select-none mr-2">Выйти из системы</span>

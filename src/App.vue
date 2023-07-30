@@ -30,7 +30,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Bars4Icon v-if="$route.path !== '/'" class="h-12 w-12 absolute left-3 top-3 cursor-pointer hover:opacity-80 transition"
+  <Bars4Icon v-if="$route.path !== '/'" class="h-14 w-14 absolute left-1 top-1 cursor-pointer hover:opacity-50 transition"
              @click="router.push('/')"/>
   <h2 class="absolute right-3 top-1">Уровень доступа: {{ userStore.access ? userStore.access : 'Неизвестный' }}</h2>
   <h2 v-if="userStore.name" class="absolute right-3 top-6">Пользовать: {{ userStore.name }}</h2>

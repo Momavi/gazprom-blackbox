@@ -51,6 +51,7 @@ import { UserCircleIcon, ChatBubbleBottomCenterIcon, TrashIcon } from '@heroicon
 const newComment = ref('');
 const showCommentInput = ref(false);
 const userStore = useUserStore();
+
 const props = defineProps({
   post: Object,
   deletePost: Function,

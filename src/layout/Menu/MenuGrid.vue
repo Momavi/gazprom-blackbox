@@ -11,16 +11,16 @@
 
 <script setup>
 import MenuItem from './MenuItem.vue';
-import { EnvelopeIcon, FolderOpenIcon, ListBulletIcon, IdentificationIcon } from '@heroicons/vue/24/solid/index.js';
+import { EnvelopeIcon, FolderOpenIcon, ListBulletIcon, GlobeAltIcon } from '@heroicons/vue/24/solid/index.js';
 import { useUserStore } from '@stores/user-reducer.js';
 const userStore = useUserStore();
 
 const items = [
   {
-    title: 'Файловое хранилище',
-    icon: FolderOpenIcon,
-    route: 'Files',
-    access: 3,
+    title: 'Лента',
+    icon: ListBulletIcon,
+    route: 'Posts',
+    access: 1,
   },
   {
     title: 'Почта',
@@ -29,16 +29,10 @@ const items = [
     access: 2,
   },
   {
-    title: 'Система пропусков',
-    icon: IdentificationIcon,
-    route: 'Identification',
+    title: 'Файловое хранилище',
+    icon: FolderOpenIcon,
+    route: 'Files',
     access: 3,
-  },
-  {
-    title: 'Лента',
-    icon: ListBulletIcon,
-    route: 'Posts',
-    access: 0,
   },
 ];
 </script>
