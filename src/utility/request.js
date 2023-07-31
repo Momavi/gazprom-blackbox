@@ -11,7 +11,7 @@ import axios from 'axios';
  * @returns {Promise} Promise с результатом запроса.
  * @throws {Error} Если в процессе выполнения запроса произошла ошибка.
  */
-export async function makeRequest(method, url, showError, data = null) {
+export async function makeRequest(method, url, showError = null, data = null) {
   try {
     const options = {
       method,
@@ -22,8 +22,11 @@ export async function makeRequest(method, url, showError, data = null) {
     const response = await axios(options);
     return response.data;
   } catch (error) {
-    showError.value = error.response.status === (403 || 401);
-    throw error;
+    if ( showError === null ) throw error;
+    else {
+      showError.value = error.response.status === (403 || 401);
+      throw error;
+    }
   }
 }
 

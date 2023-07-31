@@ -24,7 +24,7 @@ import Post from './Post.vue';
 import { useUserStore } from '@stores/user-reducer.js';
 import { useNotificationStore } from '@stores/notification.js';
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
+import { makeRequest } from '../../utility/request.js';
 
 const userStore = useUserStore();
 const notificationStore = useNotificationStore();
@@ -34,8 +34,7 @@ const posts = ref([]);
 
 async function getPost() {
   try {
-    const resp = await axios.get('/api/posts');
-    posts.value = resp.data;
+    posts.value = await makeRequest('get', '/api/posts');
   } catch {
     await handleApiError();
   }
@@ -43,13 +42,10 @@ async function getPost() {
 
 async function addPost() {
   try {
-    const resp = await axios.post('/api/posts/',
-        {
-          userId: userStore.id,
-          message: newPost.value,
-        },
-    );
-    posts.value = resp.data;
+    posts.value = await makeRequest('post', `/api/posts/`, null, {
+      userId: userStore.id,
+      message: newPost.value,
+    });
     notificationStore.setData(200, 'Пост добавлен');
     newPost.value = '';
   } catch {
@@ -59,14 +55,11 @@ async function addPost() {
 
 async function addComment(post, newComment) {
   try {
-    const resp = await axios.post('/api/posts/post/comment',
-        {
-          userId: userStore.id,
-          postId: post.id,
-          message: newComment,
-        },
-    );
-    post.comments.push(resp.data);
+    post.comments.push(await makeRequest('post', `/api/posts/post/comment`, null, {
+      userId: userStore.id,
+      postId: post.id,
+      message: newComment,
+    }));
     notificationStore.setData(200, 'Коммент добавлен');
   } catch {
     await handleApiError();
@@ -75,8 +68,7 @@ async function addComment(post, newComment) {
 
 async function deletePost(post) {
   try {
-    const resp = await axios.delete(`/api/posts/${ post.id }`);
-    posts.value = resp.data;
+    posts.value = await makeRequest('delete', `/api/posts/${ post.id }`);
     notificationStore.setData(200, 'Пост удален');
   } catch {
     await handleApiError();
@@ -85,7 +77,7 @@ async function deletePost(post) {
 
 async function deleteComment(post, comment) {
   try {
-    await axios.delete(`/api/posts/${ post.id }/comments/${ comment.id }`);
+    await makeRequest('delete', `/api/posts/${ post.id }/comments/${ comment.id }`);
     const postId = posts.value.findIndex(item => item.id === post.id);
     const indexToRemove = post.comments.findIndex(item => item.id === comment.id);
     notificationStore.setData(200, 'Комментарий удален');
