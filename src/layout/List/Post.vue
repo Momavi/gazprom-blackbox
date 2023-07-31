@@ -60,7 +60,7 @@ const props = defineProps({
 });
 
 function sendAddComment(post) {
-  props.addComment(post, this.newComment)
-  this.newComment = ''
+  props.addComment(post, newComment.value)
+  newComment.value = ''
 }
 </script>
