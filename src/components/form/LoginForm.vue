@@ -90,7 +90,6 @@ async function submitForm() {
     } catch ( err ) {
       error.value = 'Внутренняя ошибка сервера';
     }
-
   });
 }
 </script>

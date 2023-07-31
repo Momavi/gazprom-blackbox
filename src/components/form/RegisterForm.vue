@@ -66,22 +66,22 @@ async function submitForm() {
 
   if ( !validateEmail(email.value) ) {
     error.value = 'Введите почту.';
-    return
+    return;
   }
 
   if ( !username.value.trim() ) {
     error.value = 'Введите имя пользователя.';
-    return
+    return;
   }
 
   if ( !password.value.trim() ) {
     error.value = 'Введите пароль.';
-    return
+    return;
   }
 
   if ( !passwordAgain.value.trim() ) {
     error.value = 'Введите пароль еще раз.';
-    return
+    return;
   }
 
   await axios.post('/api/users/register',
@@ -101,18 +101,27 @@ async function submitForm() {
       notificationStore.setData(200, resp.data.message);
       localStorage.setItem('token', resp.data.token);
       modalStore.closeLogin();
-    }).catch((error) => {
-      console.log(error);
-      if ( error.response.status === 429 )
-        this.error = error.response.data;
-      else
-        this.error = error.response.data.message;
+    }).catch((err) => {
+      try {
+        if ( err.response.status === 429 ) {
+          console.log(error, err.response);
+          error.value = err.response.data;
+        } else {
+          error.value = err.response.data.message;
+        }
+      } catch ( err ) {
+        error.value = 'Внутренняя ошибка сервера';
+      }
     });
     modalStore.closeRegister();
     notificationStore.setData(200, resp.data.message);
-  }).catch((error) => {
-    console.log(error);
-    this.error = error.response.data.message;
+  }).catch((err) => {
+    if ( err.response.status === 429 ) {
+      console.log(error, err.response);
+      error.value = err.response.data;
+    } else {
+      error.value = err.response.data.message;
+    }
   });
 }
 </script>
